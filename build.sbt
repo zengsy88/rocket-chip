@@ -53,16 +53,17 @@ lazy val commonSettings = Seq(
   }
 )
 
-lazy val chisel = (project in file("chisel3")).settings(commonSettings)
+// Optionally depend on chisel3 from source
+val chisel3DirOpt = sys.props.get("rocketchip.chisel3.path")
+lazy val chisel = project in file(chisel3DirOpt.getOrElse(".fake_chisel3"))
 
-def dependOnChisel(prj: Project) = {
-  if (sys.props.contains("ROCKET_USE_MAVEN")) {
-    prj.settings(
-      libraryDependencies ++= Seq("edu.berkeley.cs" %% "chisel3" % "3.2-SNAPSHOT")
-    )
-  } else {
-    prj.dependsOn(chisel)
-  }
+lazy val chisel3LibraryDepSettings = Seq(
+  libraryDependencies += "edu.berkeley.cs" %% "chisel3" % "3.3.2"
+)
+
+def dependOnChisel(proj: Project): Project = chisel3DirOpt match {
+  case None    => proj.settings(chisel3LibraryDepSettings)
+  case Some(_) => proj.dependsOn(chisel)
 }
 
 lazy val `api-config-chipsalliance` = (project in file("api-config-chipsalliance/build-rules/sbt"))

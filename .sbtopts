@@ -1,0 +1,3 @@
+-Dtreadle.firrtl.path=../firrtl
+-Dchisel3.treadle.path=../treadle
+-Drocketchip.chisel3.path=chisel3
